@@ -1,2 +1,106 @@
-# -
+# DeepFakes_teaching
 heiheihei~~~~
+片儿里的主角不错，我也想当
+不死心的可以试下磁力链接，在能下载到fakeapp的前提下，再阅读本文。
+本文的fakeapp是2.0的版本。其他版本自求多福
+
+## 环境配置
+
+### FakeApp(Windows专用)
+
+~~http://www.fakeapp.org/ 官网下载~~ 或使用磁力链接  (官网已挂，磁力自求多福)
+
+magnet:?xt=urn:btih:598F5888522C860D48629EB8EC267496B4322E70
+
+封装好的神器
+
+### GPU加速(强烈建议)
+
+如果有N卡，建议使用GPU计算，需要先安装 Nvidia cuda , 建议安装 8.0 版本 [下载地址](https://developer.nvidia.com/cuda-80-ga2-download-archive)
+
+无N卡，可以使用CPU，very low
+
+> N卡建议GTX1060起，显存2G以上
+
+### VC库 (可选)
+附赠品 如果操作过程中报错了，可以选择安装这个
+[下载连接](https://download.microsoft.com/download/9/3/F/93FCF1E7-E6A4-478B-96E7-D4B285925B00/vc_redist.x64.exe
+)
+
+
+## 原理简介
+
+如何把A视频的脸，替换进B视频 ？ 
+
+分以下几步：
+
+### 1.收集A,B的脸
+因为是视频，所以要用一些特殊的技巧，把一个视频，转换成一张张图片，比如10s的视频，可能会有上百张图片，然后在上百张图片里，找出带有人脸的，最终都截取成相同大小的，比如256\*256的脸图片
+
+### 2.训练模型，A->B
+有了A的256\*256脸，和B的256\*256脸，通过一些特殊的技巧，能找到两张脸之间联系，图片数越多，联系也就越紧，找到关系后，保存成 模型。这个模型的作用就是，给一张A的脸，输入进模型，模型会给出B的脸
+
+### 3.换脸
+随便找一个A的视频，依旧是转换成一张张图片，依旧要找出带有人脸的图片。把这一张张图片，丢进第2步得到的模型，就能得出一张张替换成B脸的图片。最后把所有的图片，再合并成视频，换脸完成
+
+
+## FakeApp使用
+也分三步，分别对应了上面的三部曲
+
+### 1.GetDataSet
+就一个参数，输入视频的路径。 这里其实是要依次执行2个视频，一个A视频，一个B视频
+
+比如 C:\video\a.mp4 
+
+
+执行完毕后，会在 c:\video 目录下，生成 dataset-a 目录
+
+dataset-a 目录，就是一张张图片 ，dataset-a 里面，还有个 extracted 目录
+
+extracted 目录，就是只保留人脸的图片，当然可能会有误差，因为是程序自动切的
+
+> 这里注意，要浏览extracted目录，只保留256\*256的人脸图片，其他都删掉
+
+最终完成后。会有 dataset-a ， dataset-b 两个目录，里面分别有 extracted 目录
+
+
+> 第一步主要是从视频里取得人脸的样本集。 程序可能会报 Failed to execute script align_faces ，这种情况可以尝试安装VC库，或者从其他途径获得人脸样本集，只要保证2张人脸的图片，大小一致
+
+### 2.Train
+
+有三个参数
+
+1. model 可以在 c:\video 下，新建个目录，叫 model ，就是空的。 那这个参数下就输入 c:\video\model ，用来保存 模型 的结果
+2. Data A ,对应了截取后的人脸目录，也就是 c:\video\dataset-a\extracted
+3. Data B ，同上,换上b的
+
+三个目录输入完后，点击 Train ，开始漫长的等待
+
+会有结果显示， Loss A, Loss B ，一般小于 0.02 ,即可认为ok，自主停掉程序
+
+![](https://www.deepfakes.club/wp-content/uploads/2018/01/train_4a.png)
+
+
+### 3.Created
+还是三个参数
+
+1. model ，同上，输入跑完的模型目录，依然是  c:\video\model
+2. 输入要换脸的视频，可以拿a视频做测试 c:\video\a.mp4
+3. fps ，30 or 24 .没啥追求的就 24 吧
+
+跑完之后，就得到了换脸后的视频
+
+
+## 总结
+1. 两个视频的人物表情，角度尽量相似
+2. 有个好显卡
+
+
+## 参考
+
+https://github.com/joshua-wu/deepfakes_faceswap
+
+https://www.deepfakes.club/tutorial/
+
+https://www.bilibili.com/video/av19349170
+
